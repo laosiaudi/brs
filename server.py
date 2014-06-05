@@ -12,12 +12,44 @@ db = MySQLdb.connect(host= "localhost", user= "JinnieTsai", passwd= "cj", db
         = "bookdb")
 cur = db.cursor()
 
-class IndexHandler(tornado.web.RequestHandler):
+class BaseHandler(tornado.web.RequestHandler):
+    def get_current_user(self):
+        return self.get_secure_cookie("user")
+
+class Application(tornado.web.Application):
+    def __init__(self):
+        handlers = [(r'/base',IndexHandler),
+                (r'/register',RegisterHandler),
+                (r'/login',LoginHandler)]
+        settings = dict(template_path=os.path.join(os.path.dirname(__file__), "templates"),
+                static_path=os.path.join(os.path.dirname(__file__), "static"),
+                cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
+                debug=True,)
+        tornado.web.Application.__init__(self, handlers, **settings)
+
+class LoginHandler(BaseHandler):
+    def get(self):
+        if self.current_user != '':
+            self.redirect('/base')
+        else:
+            pass
+
+    def post(self):
+        usr = self.get_argument('email','')
+        password = self.get_argument('pass','')
+        record = cur.execute("SELECT * FROM userinfo_db WHERE email = %s
+                and user_name = %s", (usr,password))
+        if cur.rowcount > 0:
+            self.redirect('/base')
+        else:
+            self.write('0')
+
+class IndexHandler(BaseHandler):
     def get(self):
         self.render("base.html")
 
 
-class RegisterHandler(tornado.web.RequestHandler):
+class RegisterHandler(BaseHandler):
     def get(self):
         self.render("register.html")
 
@@ -44,12 +76,9 @@ class RegisterHandler(tornado.web.RequestHandler):
 
 if __name__ == "__main__":
     tornado.options.parse_command_line()
-    app = tornado.web.Application(handlers=[(r"/base", IndexHandler),
-        (r"/register", RegisterHandler)])
-    http_server = tornado.httpserver.HTTPServer(app)
+    http_server = tornado.httpserver.HTTPServer(Application())
     http_server.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()
-
 
 
 
