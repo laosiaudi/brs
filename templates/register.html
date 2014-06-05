@@ -1,0 +1,33 @@
+{% extends base.html %}
+
+  {% block title %}
+    <title>Register</title>
+  {% end block %}
+
+  {% block main %}
+<form class="form-inline" style='margin: 2% 0 0 30%;' role="form">
+  <div class="form-group">
+    <label for="exampleInputEmail2">Email address</label>
+    <input type="email" class="form-control" id="exampleInputEmail2" placeholder="Enter email">
+  </div><br><br>
+  <div class="form-group">
+    <label>Username</label>
+    <input class="form-control" id="username" placeholder="Enter username">
+  </div><br><br>
+  <div class="form-group">
+    <label>Password</label>
+    <input type="password" class="form-control" id="pw1" placeholder="Password">
+  </div><br><br>
+  <div class="form-group">
+    <label>Enter again</label>
+    <input type="password" class="form-control" id="pw2" placeholder="Password">
+  </div><br><br>
+  <button type="submit" class="btn btn-default">Register</button>
+</form>
+
+  {% end block %}
+
+
+
+
+
