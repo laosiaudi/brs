@@ -33,7 +33,9 @@
           <ul class="nav navbar-nav">
             <!-- <li class="active"><a href="#">Home</a></li> -->
             <li><a href="/book">图书</a></li>
-            <li><a href="#">{{ me }}</a></li>
+            {% if me %}
+              <li><a href="#">{{ me }}</a></li>
+            {% end if %}
           </ul>
         </div>
       </div>
