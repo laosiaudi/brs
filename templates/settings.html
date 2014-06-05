@@ -1,26 +1,27 @@
 {% extends base.html %}
 
   {% block title %}
-    <title>Register</title>
+    <title>Settings</title>
   {% end block %}
 
   {% block main %}
   <form method='POST' class="form-inline" style='margin: 2% 0 0 30%;' role="form">
     <div class="form-group">
-      <label>Email address</label>
-      <input type="email" class="form-control" name="email" placeholder="Enter email">
-    </div><br><br>
-    <div class="form-group">
-      <label>Password</label>
+      <label>旧密码</label>
       <input type="password" class="form-control" name="pw1" placeholder="Password">
     </div><br><br>
     <div class="form-group">
-      <label>Enter again</label>
+      <label>新密码</label>
       <input type="password" class="form-control" name="pw2" placeholder="Password">
     </div><br><br>
     {% include 'tags.html' %}
-    <br>
-    <button type="submit" class="btn btn-default">Register</button>
+    <button type="submit" class="btn btn-default">Login</button>
+
+    <script>
+      window.onload = function() {
+        //
+      }
+    </script>
   </form>
 
   {% end block %}
