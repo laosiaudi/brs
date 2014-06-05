@@ -56,12 +56,13 @@ class RegisterHandler(BaseHandler):
         self.render("register.html", me=self.current_user)
 
     def post(self):
-        Email = self.get_argument("exampleInputEmail2")
-        Username = self.get_argument("username")
+        Email = self.get_argument("email")
+        Username = 'Handsomeboy'
         Password = self.get_argument("pw1")
-        Interests = self.get_argument("interests")
+        #Interests = self.get_argument("interests")
+        Interests = '0,1,2'
         same_email =  cur.execute("SELECT * FROM userinfo_db WHERE email = %s\
-                or user_name = %s", (Email, Username))
+                or username = %s", (Email, Username))
         if cur.rowcount > 0:
             '''This indicates that some user has already existed with the same
             email or the same user name'''
@@ -69,8 +70,9 @@ class RegisterHandler(BaseHandler):
         else:
             total_user = cur.execute("SELECT * FROM userinfo_db")
             user_id = cur.rowcount + 1
-            cur.execute("INSERT INTO userinfo_db (email, user_name, user_id,passwd, interests) VALUES (%s, %s, %d, %s, %s)", (Email,
-                        Username, user_id, Password, Interests))
+            user_id = int(user_id)
+            cur.execute("INSERT INTO userinfo_db (username, passwd,email,user_id, interests) VALUES ('%s', '%s', '%s',\
+                   '%d','%s')" % (Username,Password, Email,1,Interests))
             db.commit()
             '''This indicates that this user register successfully'''
             self.write("0")
