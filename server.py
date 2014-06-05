@@ -46,7 +46,8 @@ class LoginHandler(BaseHandler):
 
 class IndexHandler(BaseHandler):
     def get(self):
-        self.render("base.html")
+       self.render("base.html", me=self.current_user)
+
 
 
 class RegisterHandler(BaseHandler):
