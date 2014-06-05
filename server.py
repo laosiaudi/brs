@@ -4,11 +4,11 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
-
+import os
 from tornado.options import define, options
 define("port", default = 8000, help = "run on the given port", type = int)
 
-db = MySQLdb.connect(host= "localhost", user= "JinnieTsai", passwd= "cj", db
+db = MySQLdb.connect(host= "localhost", user= "root", passwd= "123456", db
         = "bookdb")
 cur = db.cursor()
 
@@ -32,14 +32,15 @@ class LoginHandler(BaseHandler):
         if self.current_user != '':
             self.redirect('/base')
         else:
-            pass
+            self.render("login.html", me=self.current_user)
 
     def post(self):
         usr = self.get_argument('email','')
         password = self.get_argument('pass','')
-        record = cur.execute("SELECT * FROM userinfo_db WHERE email = %s
+        record = cur.execute("SELECT * FROM userinfo_db WHERE email = %s\
                 and user_name = %s", (usr,password))
         if cur.rowcount > 0:
+            self.set_secure_cookie("user",email)
             self.redirect('/base')
         else:
             self.write('0')
@@ -52,14 +53,14 @@ class IndexHandler(BaseHandler):
 
 class RegisterHandler(BaseHandler):
     def get(self):
-        self.render("register.html")
+        self.render("register.html", me=self.current_user)
 
     def post(self):
         Email = self.get_argument("exampleInputEmail2")
         Username = self.get_argument("username")
         Password = self.get_argument("pw1")
         Interests = self.get_argument("interests")
-        same_email =  cur.execute("SELECT * FROM userinfo_db WHERE email = %s
+        same_email =  cur.execute("SELECT * FROM userinfo_db WHERE email = %s\
                 or user_name = %s", (Email, Username))
         if cur.rowcount > 0:
             '''This indicates that some user has already existed with the same
