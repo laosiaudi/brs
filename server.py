@@ -10,8 +10,9 @@ from tornado.options import define, options
 import json
 define("port", default = 8000, help = "run on the given port", type = int)
 
-db = MySQLdb.connect(host= "localhost", user= "root", passwd= "123456", db
+db = MySQLdb.connect(host= "localhost", user= "caijin", passwd= "some_pass", db
         = "bookdb")
+db.set_character_set('utf8')
 cur = db.cursor()
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -57,7 +58,8 @@ class LogoutHandler(BaseHandler):
         self.redirect('/login')
 class IndexHandler(BaseHandler):
     def get(self):
-        cur.execute("SELECT book_name, author, average_score, picture from book_info order by average_score asc")
+        cur.execute("SELECT book_name, author, average_score, picture from \
+                book_info order by average_score desc limit 20")
         result = cur.fetchall()
         booklist = []
         for row in result:
@@ -66,6 +68,7 @@ class IndexHandler(BaseHandler):
             group['author'] = row[1]
             group['average_score'] = row[2]
             group['picture'] = row[3]
+            print group['bookname']
             booklist.append(group)
         if self.current_user != '':
             pass
