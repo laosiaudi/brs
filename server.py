@@ -7,6 +7,7 @@ import tornado.web
 import os
 import md5
 from tornado.options import define, options
+import json
 define("port", default = 8000, help = "run on the given port", type = int)
 
 db = MySQLdb.connect(host= "localhost", user= "root", passwd= "123456", db
@@ -55,7 +56,20 @@ class LogoutHandler(BaseHandler):
         self.redirect('/login')
 class IndexHandler(BaseHandler):
     def get(self):
-       self.render("base.html", me=self.current_user)
+        cur.execute("SELECT book_name, author, average_score, picture from book_info order by average_score asc")
+        result = cur.fetchall()
+        booklist = []
+        for row in result:
+            group = {}
+            group['bookname'] = row[0]
+            group['author'] = row[1]
+            group['average_score'] = row[2]
+            group['picture'] = row[3]
+            booklist.append(group)
+        if self.current_user != '':
+            pass
+        information = json.dumps(booklist)
+        self.render("base.html", me=self.current_user)
 
 
 
