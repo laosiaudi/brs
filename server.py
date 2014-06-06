@@ -20,10 +20,11 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class Application(tornado.web.Application):
     def __init__(self):
-        handlers = [(r'/base',IndexHandler),
+        handlers = [(r'/index',IndexHandler),
                 (r'/register',RegisterHandler),
                 (r'/login',LoginHandler),
-                (r'/logout',LogoutHandler)]
+                (r'/logout',LogoutHandler),
+                (r'/settings',SettingHandler)]
         settings = dict(template_path=os.path.join(os.path.dirname(__file__), "templates"),
                 static_path=os.path.join(os.path.dirname(__file__), "static"),
                 cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
@@ -33,7 +34,7 @@ class Application(tornado.web.Application):
 class LoginHandler(BaseHandler):
     def get(self):
         if self.current_user != '':
-            self.redirect('/base')
+            self.redirect('/index')
         else:
             self.render("login.html", me=self.current_user)
 
@@ -45,7 +46,7 @@ class LoginHandler(BaseHandler):
         record = cur.execute("SELECT * FROM userinfo_db WHERE email = %s and passwd = %s", (usr,key.hexdigest()))
         if cur.rowcount > 0:
             self.set_secure_cookie("user",usr)
-            self.redirect('/base')
+            self.redirect('/index')
         else:
             self.write('login failed')
 
@@ -68,22 +69,37 @@ class IndexHandler(BaseHandler):
             booklist.append(group)
         if self.current_user != '':
             pass
-        information = json.dumps(booklist)
-        self.render("base.html", me=self.current_user)
+        books = json.dumps(booklist)
+        self.render("index.html", me=self.current_user)
 
 
+class SettingHandler(BaseHandler):
+    def get(self):
+        if self.current_user != '':
+            self.render("settings.html",me=self.current_user)
+        else:
+            self.redirect('/login')
 
 class RegisterHandler(BaseHandler):
     def get(self):
-        self.render("register.html", me=self.current_user)
+        if self.current_user == '' or self.current_user == None:
+            self.render("register.html", me=self.current_user)
+        else:
+            self.redirect('/index')
 
     def post(self):
         Email = self.get_argument("email")
         Password = self.get_argument("pw1")
         key = md5.new()
         key.update(Password);
+        Interests = ''
+        for i in range(47):
+            if self.get_argument(str(i),None) !=None:
+                Interests += str(i) + ','
+                print '-----'
         #Interests = self.get_argument("interests")
-        Interests = '0,1,2'
+        #Interests = '0,1,2'
+        print Interests
         same_email =  cur.execute("SELECT * FROM userinfo_db WHERE email = %s", (Email))
         if cur.rowcount > 0:
             '''This indicates that some user has already existed with the same
