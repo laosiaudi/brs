@@ -37,8 +37,7 @@ class LoginHandler(BaseHandler):
     def post(self):
         usr = self.get_argument('email','')
         password = self.get_argument('pass','')
-        record = cur.execute("SELECT * FROM userinfo_db WHERE email = %s\
-                and user_name = %s", (usr,password))
+        record = cur.execute("SELECT * FROM userinfo_db WHERE email = %s and passwd = %s", (usr,password))
         if cur.rowcount > 0:
             self.set_secure_cookie("user",email)
             self.redirect('/base')
@@ -57,12 +56,10 @@ class RegisterHandler(BaseHandler):
 
     def post(self):
         Email = self.get_argument("email")
-        Username = 'Handsomeboy'
         Password = self.get_argument("pw1")
         #Interests = self.get_argument("interests")
         Interests = '0,1,2'
-        same_email =  cur.execute("SELECT * FROM userinfo_db WHERE email = %s\
-                or username = %s", (Email, Username))
+        same_email =  cur.execute("SELECT * FROM userinfo_db WHERE email = %s", (Email))
         if cur.rowcount > 0:
             '''This indicates that some user has already existed with the same
             email or the same user name'''
@@ -71,8 +68,8 @@ class RegisterHandler(BaseHandler):
             total_user = cur.execute("SELECT * FROM userinfo_db")
             user_id = cur.rowcount + 1
             user_id = int(user_id)
-            cur.execute("INSERT INTO userinfo_db (username, passwd,email,user_id, interests) VALUES ('%s', '%s', '%s',\
-                   '%d','%s')" % (Username,Password, Email,1,Interests))
+            cur.execute("INSERT INTO userinfo_db (passwd,email,user_id, interests) VALUES ('%s', '%s',\
+                   '%d','%s')" % (Password, Email,1,Interests))
             db.commit()
             '''This indicates that this user register successfully'''
             self.write("0")
