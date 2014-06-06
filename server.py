@@ -5,6 +5,7 @@ import tornado.ioloop
 import tornado.options
 import tornado.web
 import os
+import md5
 from tornado.options import define, options
 define("port", default = 8000, help = "run on the given port", type = int)
 
@@ -20,7 +21,8 @@ class Application(tornado.web.Application):
     def __init__(self):
         handlers = [(r'/base',IndexHandler),
                 (r'/register',RegisterHandler),
-                (r'/login',LoginHandler)]
+                (r'/login',LoginHandler),
+                (r'/logout',LogoutHandler)]
         settings = dict(template_path=os.path.join(os.path.dirname(__file__), "templates"),
                 static_path=os.path.join(os.path.dirname(__file__), "static"),
                 cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
@@ -36,14 +38,21 @@ class LoginHandler(BaseHandler):
 
     def post(self):
         usr = self.get_argument('email','')
-        password = self.get_argument('pass','')
-        record = cur.execute("SELECT * FROM userinfo_db WHERE email = %s and passwd = %s", (usr,password))
+        password = self.get_argument('pw1','')
+        key = md5.new()
+        key.update(password)
+        record = cur.execute("SELECT * FROM userinfo_db WHERE email = %s and passwd = %s", (usr,key.hexdigest()))
         if cur.rowcount > 0:
-            self.set_secure_cookie("user",email)
+            self.set_secure_cookie("user",usr)
             self.redirect('/base')
         else:
-            self.write('0')
+            self.write('login failed')
 
+
+class LogoutHandler(BaseHandler):
+    def get(self):
+        self.set_secure_cookie('user','')
+        self.redirect('/login')
 class IndexHandler(BaseHandler):
     def get(self):
        self.render("base.html", me=self.current_user)
@@ -57,22 +66,25 @@ class RegisterHandler(BaseHandler):
     def post(self):
         Email = self.get_argument("email")
         Password = self.get_argument("pw1")
+        key = md5.new()
+        key.update(Password);
         #Interests = self.get_argument("interests")
         Interests = '0,1,2'
         same_email =  cur.execute("SELECT * FROM userinfo_db WHERE email = %s", (Email))
         if cur.rowcount > 0:
             '''This indicates that some user has already existed with the same
             email or the same user name'''
-            self.write("1")
+            self.write("User Already Exists!")
         else:
             total_user = cur.execute("SELECT * FROM userinfo_db")
             user_id = cur.rowcount + 1
             user_id = int(user_id)
+            store_pass = key.hexdigest()
             cur.execute("INSERT INTO userinfo_db (passwd,email,user_id, interests) VALUES ('%s', '%s',\
-                   '%d','%s')" % (Password, Email,1,Interests))
+                   '%d','%s')" % (store_pass, Email,user_id,Interests))
             db.commit()
             '''This indicates that this user register successfully'''
-            self.write("0")
+            self.write("Register Successfully")
 
 
 if __name__ == "__main__":
