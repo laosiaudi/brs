@@ -69,8 +69,8 @@ class IndexHandler(BaseHandler):
             booklist.append(group)
         if self.current_user != '':
             pass
-        books = json.dumps(booklist)
-        self.render("index.html", me=self.current_user)
+        #books = json.dumps(booklist)
+        self.render("index.html", me=self.current_user,books = booklist)
 
 
 class SettingHandler(BaseHandler):
@@ -96,10 +96,6 @@ class RegisterHandler(BaseHandler):
         for i in range(47):
             if self.get_argument(str(i),None) !=None:
                 Interests += str(i) + ','
-                print '-----'
-        #Interests = self.get_argument("interests")
-        #Interests = '0,1,2'
-        print Interests
         same_email =  cur.execute("SELECT * FROM userinfo_db WHERE email = %s", (Email))
         if cur.rowcount > 0:
             '''This indicates that some user has already existed with the same
