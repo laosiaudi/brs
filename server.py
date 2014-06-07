@@ -10,7 +10,7 @@ from tornado.options import define, options
 import json
 define("port", default = 8000, help = "run on the given port", type = int)
 
-db = MySQLdb.connect(host= "localhost", user= "caijin", passwd= "some_pass", db
+db = MySQLdb.connect(host= "localhost", user= "root", passwd= "123456", db
         = "bookdb")
 db.set_character_set('utf8')
 cur = db.cursor()
@@ -21,7 +21,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class Application(tornado.web.Application):
     def __init__(self):
-        handlers = [(r'/index',IndexHandler),
+        handlers = [(r'/',IndexHandler),
                 (r'/register',RegisterHandler),
                 (r'/login',LoginHandler),
                 (r'/logout',LogoutHandler),
@@ -35,7 +35,7 @@ class Application(tornado.web.Application):
 class LoginHandler(BaseHandler):
     def get(self):
         if self.current_user != '':
-            self.redirect('/index')
+            self.redirect('/')
         else:
             self.render("login.html", me=self.current_user)
 
@@ -47,7 +47,7 @@ class LoginHandler(BaseHandler):
         record = cur.execute("SELECT * FROM userinfo_db WHERE email = %s and passwd = %s", (usr,key.hexdigest()))
         if cur.rowcount > 0:
             self.set_secure_cookie("user",usr)
-            self.redirect('/index')
+            self.redirect('/')
         else:
             self.write('login failed')
 
@@ -83,12 +83,31 @@ class SettingHandler(BaseHandler):
         else:
             self.redirect('/login')
 
+    def post(self):
+        pw1 = self.get_argument('pw1')
+        pw2 = self.get_argument('pw2')
+        Interests = ''
+        for i in range(47):
+            if self.get_argument(str(i),None) !=None:
+                Interests += str(i) + ','
+        key = md5.new()
+        key.update(pw1)
+        newkey = md5.new()
+        newkey.update(pw2)
+        try:
+            cur.execute("UPDATE userinfo_db SET passwd = '%s' , interests = '%s' WHERE email = '%s' and passwd = '%s'" % \
+                    (newkey.hexdigest(),Interests ,self.current_user,key.hexdigest()))
+            db.commit()
+            self.redirect('/')
+        except:
+            db.rollback()
+
 class RegisterHandler(BaseHandler):
     def get(self):
         if self.current_user == '' or self.current_user == None:
             self.render("register.html", me=self.current_user)
         else:
-            self.redirect('/index')
+            self.redirect('/')
 
     def post(self):
         Email = self.get_argument("email")
@@ -113,7 +132,7 @@ class RegisterHandler(BaseHandler):
                    '%d','%s')" % (store_pass, Email,user_id,Interests))
             db.commit()
             '''This indicates that this user register successfully'''
-            self.write("Register Successfully")
+            self.redirect('/login')
 
 
 if __name__ == "__main__":
