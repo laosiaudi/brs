@@ -26,7 +26,7 @@ class Application(tornado.web.Application):
                 (r'/login',LoginHandler),
                 (r'/logout',LogoutHandler),
                 (r'/settings',SettingHandler),
-                (r'/book/([0-9]*)',BookHandler)]
+                (r'/book/(\d+)$',BookHandler)]
         settings = dict(template_path=os.path.join(os.path.dirname(__file__), "templates"),
                 static_path=os.path.join(os.path.dirname(__file__), "static"),
                 cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
@@ -126,15 +126,23 @@ class BookHandler(BaseHandler):
         group['introduction'] =  row[6]
         self.render('book.html',me = self.current_user,book = group)
 
-    def post(self):
-        score = self.get_argument('score')
-        isbn = self.get_argument('isbn')
-        cur.execute("SELECT user_id from userinfo_db WHERE email = '%s'" % (email))
+    def post(self, para):
+#        score = self.get_argument('score')
+#        isbn = self.get_argument('isbn')
+        score =  9.7
+        isbn = '9787532740086'
+        cur.execute("SELECT user_id from userinfo_db WHERE email = '%s'" %\
+                (self.current_user))
         data = cur.fetchone()
         user_id = int(data[0])
-        cur.execute("INSERT INTO score_info (user_id, isbn, score) VALUES\
-               ('%d', '%s','%f')" % (user_id, isbn, float(score))
-        db.commit()
+        try:
+            cur.execute("INSERT INTO score_info (user_id, isbn, score) VALUES ('%d', '%s','%f')" % (user_id, isbn, float(score)))
+            print '---'
+            db.commit()
+            self.write('1')
+        except:
+            db.rollback()
+            self.write('0')
 
         
         
