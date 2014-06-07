@@ -36,7 +36,7 @@ class Application(tornado.web.Application):
 
 class LoginHandler(BaseHandler):
     def get(self):
-        if self.current_user != '':
+        if self.current_user != '' and self.current_user !=  None:
             self.redirect('/')
         else:
             self.render("login.html", me=self.current_user)
@@ -75,7 +75,7 @@ class IndexHandler(BaseHandler):
             group['v'] =  1
             booklist.append(group)
         copy =  booklist[:]
-        if self.current_user != '':
+        if self.current_user != '' and self.current_user !=  None:
             cur.execute("SELECT interests from userinfo_db WHERE email = '%s'" % (self.current_user))
             result= cur.fetchone()
             data = []
@@ -191,7 +191,7 @@ class SearchHandler(tornado.web.RequestHandler):
 
 class SettingHandler(BaseHandler):
     def get(self):
-        if self.current_user != '':
+        if self.current_user != '' and self.current_user !=  None:
             cur.execute("SELECT interests from userinfo_db WHERE email = '%s'" % (self.current_user))
             result= cur.fetchone()
             data = []
