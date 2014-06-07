@@ -78,7 +78,14 @@ class IndexHandler(BaseHandler):
 class SettingHandler(BaseHandler):
     def get(self):
         if self.current_user != '':
-            self.render("settings.html",me=self.current_user)
+            cur.execute("SELECT interests from userinfo_db WHERE email = '%s'" % (self.current_user))
+            result= cur.fetchone()
+            data = []
+            for item in result:
+                titem = item.split(',')
+                for digit in titem:
+                    data.append(digit)
+            self.render("settings.html",me=self.current_user, tags = data[:-1])
         else:
             self.redirect('/login')
 
