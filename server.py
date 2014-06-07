@@ -47,7 +47,7 @@ class LoginHandler(BaseHandler):
         record = cur.execute("SELECT * FROM userinfo_db WHERE email = %s and passwd = %s", (usr,key.hexdigest()))
         if cur.rowcount > 0:
             self.set_secure_cookie("user",usr)
-            self.redirect('/')
+            self.write('1') #This indicates that the login successes.
         else:
             self.write('0') #This indicates that the login failed due to the passwd error
 
@@ -68,7 +68,6 @@ class IndexHandler(BaseHandler):
             group['author'] = row[1]
             group['average_score'] = row[2]
             group['picture'] = row[3]
-            print group['bookname']
             booklist.append(group)
         if self.current_user != '':
             pass
@@ -98,7 +97,7 @@ class SettingHandler(BaseHandler):
             cur.execute("UPDATE userinfo_db SET passwd = '%s' , interests = '%s' WHERE email = '%s' and passwd = '%s'" % \
                     (newkey.hexdigest(),Interests ,self.current_user,key.hexdigest()))
             db.commit()
-            self.redirect('/')
+            self.write('1')
         except:
             db.rollback()
             self.write('0') #This indicates that the settings update failed
@@ -133,7 +132,7 @@ class RegisterHandler(BaseHandler):
                    '%d','%s')" % (store_pass, Email,user_id,Interests))
             db.commit()
             '''This indicates that this user register successfully'''
-            self.redirect('/login')
+            self.write('1')
 
 
 if __name__ == "__main__":
