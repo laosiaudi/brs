@@ -3,7 +3,7 @@
 # FILE:     demo.py
 # 2014 @laosiaudi All rights reserved
 # CREATED:  2014-06-05 19:13:12
-# MODIFIED: 2014-06-07 00:20:08
+# MODIFIED: 2014-06-07 20:34:35
 
 import urllib
 import time
@@ -80,50 +80,37 @@ for link in data:
     if count % 2 == 0:
         continue
 
-    if count % 118 == 0:
-        time.sleep(60)
+    try:
+        pat = re.compile(r'[0-9]+') #设置正则表达式
+        
+        match = pat.search(link) #匹配搜索
+        
+        bookid = match.group() #转化成字符串
+        
+        print "bookid is---------" + bookid
+        html = urllib.urlopen("https://api.douban.com/v2/book/" + bookid)
+        text = BeautifulSoup(html)
+        content = json.loads(text.get_text())
+        
+        author = content['author'][0].encode("utf-8")
+        book_name = content['title'].encode("utf-8")
+        pic_url = content['images']['large'].encode("utf-8")
+        isbn = content['isbn13'].encode("utf-8")
+        publish = content['publisher'].encode("utf-8")
+        average_score = float(content['rating']['average'])
+        visited = 0
+        tags = ""
+        for tag in content["tags"]:
+            for item in TAGS:
+                if (tag['title'] == TAGS[item]):
+                    tags += (item + ' ')
 
-    pat = re.compile(r'[0-9]+') #设置正则表达式
-    
-    match = pat.search(link) #匹配搜索
-    
-    bookid = match.group() #转化成字符串
-    
-    print "bookid is---------" + bookid
-    html = urllib.urlopen("https://api.douban.com/v2/book/" + bookid)
-    text = BeautifulSoup(html)
-    content = json.loads(text.get_text())
-    
-    author = content['author'][0].encode("utf-8")
-    print author
-    print '-----------------------------------'
-    book_name = content['title'].encode("utf-8")
-    print book_name
-    print '-----------------------------------'
-    pic_url = content['images']['large'].encode("utf-8")
-    print pic_url
-    print '-----------------------------------'
-    isbn = content['isbn13'].encode("utf-8")
-    print isbn
-    print '-----------------------------------'
-    publish = content['publisher'].encode("utf-8")
-    print publish
-    print '-----------------------------------'
-    average_score = float(content['rating']['average'])
-    print average_score
-    print '-----------------------------------'
-    visited = 0
-    tags = ""
-    for tag in content["tags"]:
-        for template in TAGS:
-            if TAGS[template] == tag:
-                tags += (template + ' ')
-    tags = tags.encode("utf8")
-    author_intro = content['author_intro'].encode("utf-8")
-    print author_intro
+        author_intro = content['author_intro'].encode("utf-8")
 
-    print '-----------------------------------'
-    print "count is ----------- %d" %(count)
+        print "count is ----------- %d" %(count)
+    except:
+        time.sleep(3700)
+
 
     try:
         cur.execute("INSERT INTO book_info (isbn, book_name, author, publish,\
@@ -134,17 +121,7 @@ for link in data:
         db.commit()
     except:
         db.rollback()
-
-    # try:
-    #     cur.execute("INSERT INTO book_info (isbn, book_name, author, publish,\
-    #             picture, visited, average_score, tag, author_intro) VALUES\
-    #             ('%s','%s', '%s', '%s', '%s', '%d', '%f', '%s', '%s')" % (isbn,\
-    #                 book_name, author, publish, pic_url, 0, average_score, tags,\
-    #                 author_intro))
-    #     db.commit()
-    # except:
-    #     db.rollback()
-    #     print 'heeheh'
+        print 'failed-----------------------------'
 
 cur.close()
 db.close()
