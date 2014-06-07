@@ -18,12 +18,14 @@
     <button type="submit" class="btn btn-default">Login</button>
 
     <script>
-      window.onload = function() {
-        //
-      }
+      var tags = {{ tags }};
     </script>
   </form>
 
+  {% end block %}
+
+  {% block js %}
+  <script src="{{ static_url('js/settings.js') }}"></script>
   {% end block %}
 
 
