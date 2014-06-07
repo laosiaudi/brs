@@ -25,7 +25,8 @@ class Application(tornado.web.Application):
                 (r'/register',RegisterHandler),
                 (r'/login',LoginHandler),
                 (r'/logout',LogoutHandler),
-                (r'/settings',SettingHandler)]
+                (r'/settings',SettingHandler),
+                (r'/book/[0-9]*',BookHandler)]
         settings = dict(template_path=os.path.join(os.path.dirname(__file__), "templates"),
                 static_path=os.path.join(os.path.dirname(__file__), "static"),
                 cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
@@ -108,6 +109,22 @@ class IndexHandler(BaseHandler):
 
 
         self.render("index.html", me=self.current_user,books = booklist)
+
+class BookHandler(BaseHandler):
+    def get(self,para):
+        cur.execute("SELECT book_name,author,publish,picture,average_score,tag, author_intro from book_info WHERE \
+                isbn = '%s'" % (para))
+        result = cur.fetchone()
+        group = {}
+        for row in result:
+            group['bookname'] = row[0]
+            group['author'] = row[1]
+            group['average_score'] = row[2]
+            group['picture'] = row[3]
+            group['tag'] = row[4]
+            group['isbn'] = row[5]
+            group['v'] =  1
+        self.render('book.html',me = self.current_user,book = group)
 
 
 class SettingHandler(BaseHandler):
