@@ -58,8 +58,8 @@ class LogoutHandler(BaseHandler):
         self.redirect('/login')
 class IndexHandler(BaseHandler):
     def get(self):
-        cur.execute("SELECT book_name, author, average_score, picture from \
-                book_info order by average_score desc limit 20")
+        cur.execute("SELECT book_name, author, average_score, picture, tags, isbn from \
+                book_info order by average_score desc limit 40")
         result = cur.fetchall()
         booklist = []
         for row in result:
@@ -68,9 +68,21 @@ class IndexHandler(BaseHandler):
             group['author'] = row[1]
             group['average_score'] = row[2]
             group['picture'] = row[3]
+            group['tag'] = row[4]
+            group['isbn'] = row[5]
             booklist.append(group)
         if self.current_user != '':
-            pass
+            cur.execute("SELECT interests from userinfo_db WHERE email = '%s'" % (self.current_user))
+            result= cur.fetchone()
+            data = []
+            if len(result) != 0:
+                titem = result.split(',')
+                data = titem[:-1]
+                for item in data:
+                    for book in booklist:
+                        taglist = book['tag'].split(',')[:-1]
+                        if not item in taglist:
+                            booklist.remove(book)
         #books = json.dumps(booklist)
         self.render("index.html", me=self.current_user,books = booklist)
 
