@@ -49,7 +49,7 @@ class LoginHandler(BaseHandler):
             self.set_secure_cookie("user",usr)
             self.redirect('/')
         else:
-            self.write('login failed')
+            self.write('0') #This indicates that the login failed due to the passwd error
 
 
 class LogoutHandler(BaseHandler):
@@ -101,6 +101,7 @@ class SettingHandler(BaseHandler):
             self.redirect('/')
         except:
             db.rollback()
+            self.write('0') #This indicates that the settings update failed
 
 class RegisterHandler(BaseHandler):
     def get(self):
@@ -122,7 +123,7 @@ class RegisterHandler(BaseHandler):
         if cur.rowcount > 0:
             '''This indicates that some user has already existed with the same
             email or the same user name'''
-            self.write("User Already Exists!")
+            self.write("0") #This indicates that the register failed due to duplicated username
         else:
             total_user = cur.execute("SELECT * FROM userinfo_db")
             user_id = cur.rowcount + 1
