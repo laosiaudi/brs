@@ -90,9 +90,17 @@ class IndexHandler(BaseHandler):
         if len(booklist) < 20:
             newblist =  []
             for item in booklist:
-                for item in copy:
-                   if item['isbn']  
-            booklist =  list(newblist)
+                for titem in copy:
+                    if item['isbn'] == titem['isbn']:
+                        newblist.append(item)
+                        booklist.remove(item)
+                        copy.remove(titem)
+            for item in booklist:
+                newblist.append(item)
+            for item in copy:
+                newblist.append(item)
+
+            booklist =  newblist
         self.render("index.html", me=self.current_user,books = booklist)
 
 
