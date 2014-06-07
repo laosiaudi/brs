@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block main %}
+  {% for book in books %}
+    <div class="col-6 col-sm-6 col-lg-4">
+      <h4>{{ book['bookname'] }}</h4>
+      <img class='book-img-middle' src='{{ book["picture"] }}'>
+      <p>
+        <span class='author'>{{ book['author']}} · 著</span><br>
+        <span class='rates'><b>评分 - </b>{{ book['average_score'] }}</span>
+      </p>
+      <p><a class="btn btn-default" href="/book/{{book['isbn']}}" role="button">View »</a></p>
+    </div>
+  {% end for %}
+{% end block %}
