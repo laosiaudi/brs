@@ -5,7 +5,7 @@
   {% end block %}
 
   {% block main %}
-  <form method='POST' class="form-inline" style='margin: 2% 0 0 30%;' role="form">
+  <form id='registerform' method='POST' class="form-inline" style='margin: 2% 0 0 30%;' role="form">
     <div class="form-group">
       <label>Email address</label>
       <input type="email" class="form-control" name="email" placeholder="Enter email">
@@ -21,8 +21,13 @@
     {% include 'tags.html' %}
     <br>
     <button type="submit" class="btn btn-default">Register</button>
+    <span id='status'><span>
   </form>
 
+  {% end block %}
+
+  {% block js %}
+  <script src="{{ static_url('js/register.js') }}"></script>
   {% end block %}
 
 
