@@ -10,7 +10,7 @@ from tornado.options import define, options
 import json
 define("port", default = 8000, help = "run on the given port", type = int)
 
-db = MySQLdb.connect(host= "localhost", user= "root", passwd= "123456", db
+db = MySQLdb.connect(host= "localhost", user= "caijin", passwd= "some_pass", db
         = "bookdb")
 db.set_character_set('utf8')
 cur = db.cursor()
@@ -58,8 +58,8 @@ class LogoutHandler(BaseHandler):
         self.redirect('/login')
 class IndexHandler(BaseHandler):
     def get(self):
-        cur.execute("SELECT book_name, author, average_score, picture, tags, isbn from \
-                book_info order by average_score desc limit 40")
+        cur.execute("SELECT book_name, author, average_score, picture, tag, isbn from \
+                book_info order by average_score desc limit 50")
         result = cur.fetchall()
         booklist = []
         for row in result:
@@ -71,19 +71,28 @@ class IndexHandler(BaseHandler):
             group['tag'] = row[4]
             group['isbn'] = row[5]
             booklist.append(group)
+        copy =  booklist
         if self.current_user != '':
             cur.execute("SELECT interests from userinfo_db WHERE email = '%s'" % (self.current_user))
             result= cur.fetchone()
             data = []
-            if len(result) != 0:
-                titem = result.split(',')
+            for item in result:
+                data.append(item)
+            if len(data) != 0:
+                titem = data[0].split(',')
                 data = titem[:-1]
                 for item in data:
                     for book in booklist:
-                        taglist = book['tag'].split(',')[:-1]
+                        taglist = book['tag'].split(' ')[:-1]
                         if not item in taglist:
                             booklist.remove(book)
         #books = json.dumps(booklist)
+        if len(booklist) < 20:
+            newblist =  []
+            for item in booklist:
+                for item in copy:
+                   if item['isbn']  
+            booklist =  list(newblist)
         self.render("index.html", me=self.current_user,books = booklist)
 
 
