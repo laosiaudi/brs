@@ -1,7 +1,7 @@
 A books recommendation system.  
 It's just a homework.
 
-to do:
-1.front end
-2.recommend
-3.finish all
+Bug:
+1.login has no redirect
+2.score operation can not make sense
+3.settings can not show 

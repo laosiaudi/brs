@@ -11,7 +11,7 @@ import json
 define("port", default = 8000, help = "run on the given port", type = int)
 
 db = MySQLdb.connect(host= "localhost", user= "caijin", passwd= "some_pass", db
-        = "bookdb")
+        = "bookdb", charset= 'utf8')
 db.set_character_set('utf8')
 cur = db.cursor()
 
@@ -27,7 +27,7 @@ class Application(tornado.web.Application):
                 (r'/logout',LogoutHandler),
                 (r'/settings',SettingHandler),
                 (r'/book/(\d+)$',BookHandler),
-                (r'/search/',SearchHandler)]
+                (r'/search?',SearchHandler)]
         settings = dict(template_path=os.path.join(os.path.dirname(__file__), "templates"),
                 static_path=os.path.join(os.path.dirname(__file__), "static"),
                 cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
@@ -149,10 +149,12 @@ class SearchHandler(tornado.web.RequestHandler):
     def get(self):
         keyword = self.get_argument("kw")
         category = self.get_argument("by")
+        print keyword
 
 
         if category == 'title':
-            cur.execute("SELECT * FROM book_info WHERE book_name LIKE %%s%", keyword)
+            cur.execute("SELECT * FROM book_info WHERE book_name LIKE '%s' " %
+                    ('%' + keyword + '%'))
             books = cur.fetchall()
             booklist = []
             for row in books:
@@ -168,7 +170,8 @@ class SearchHandler(tornado.web.RequestHandler):
             self.render('index.html',me=self.current_user,books=booklist)
 
         elif category == 'author':
-            cur.execute("SELECT * FROM book_info WHERE author LIKE %%s%", keyword)
+            cur.execute("SELECT * FROM book_info WHERE author LIKE '%s' " % ('%'
+                + keyword + '%'))
             books = cur.fetchall()
             booklist = []
             for row in books:
