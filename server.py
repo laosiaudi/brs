@@ -70,8 +70,9 @@ class IndexHandler(BaseHandler):
             group['picture'] = row[3]
             group['tag'] = row[4]
             group['isbn'] = row[5]
+            group['v'] =  1
             booklist.append(group)
-        copy =  booklist
+        copy =  booklist[:]
         if self.current_user != '':
             cur.execute("SELECT interests from userinfo_db WHERE email = '%s'" % (self.current_user))
             result= cur.fetchone()
@@ -87,20 +88,25 @@ class IndexHandler(BaseHandler):
                         if not item in taglist:
                             booklist.remove(book)
         #books = json.dumps(booklist)
+        newblist =  []
         if len(booklist) < 20:
-            newblist =  []
             for item in booklist:
                 for titem in copy:
                     if item['isbn'] == titem['isbn']:
                         newblist.append(item)
-                        booklist.remove(item)
-                        copy.remove(titem)
+                        item['v'] =  0
+                        titem['v'] =  0
+                        
             for item in booklist:
-                newblist.append(item)
+                if item['v'] ==  1:
+                    newblist.append(item)
             for item in copy:
-                newblist.append(item)
-
+                if item['v'] ==  1:
+                    newblist.append(item)
             booklist =  newblist
+            print len(booklist)
+
+
         self.render("index.html", me=self.current_user,books = booklist)
 
 
