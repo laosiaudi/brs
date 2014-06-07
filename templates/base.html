@@ -35,6 +35,9 @@
             <li><a href="/book">图书</a></li>
             {% if me %}
               <li><a href="#">{{ me }}</a></li>
+            {% else %}
+              <li><a href="/login">登录</a></li>
+              <li><a href="/register">注册</a></li>
             {% end if %}
           </ul>
         </div>
