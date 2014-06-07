@@ -128,6 +128,14 @@ class BookHandler(BaseHandler):
 
     def post(self):
         score = self.get_argument('score')
+        isbn = self.get_argument('isbn')
+        cur.execute("SELECT user_id from userinfo_db WHERE email = '%s'" % (email))
+        data = cur.fetchone()
+        user_id = int(data[0])
+        cur.execute("INSERT INTO score_info (user_id, isbn, score) VALUES\
+               ('%d', '%s','%f')" % (user_id, isbn, float(score))
+        db.commit()
+
         
         
 
