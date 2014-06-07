@@ -59,3 +59,7 @@ footer {
   height: 100px;
 }
 
+#status {
+  margin-left: 4%;
+  color: red;
+}

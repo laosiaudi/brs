@@ -3,7 +3,7 @@
 {% block main %}
   {% for book in books %}
     <div class="col-6 col-sm-6 col-lg-4">
-      <h2>{{ book['bookname'] }}</h2>
+      <h4>{{ book['bookname'] }}</h4>
       <img class='book-img-middle' src='{{ book["picture"] }}'>
       <p>
         <span class='author'>{{ book['author']}}</span><br>
