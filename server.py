@@ -26,7 +26,8 @@ class Application(tornado.web.Application):
                 (r'/login',LoginHandler),
                 (r'/logout',LogoutHandler),
                 (r'/settings',SettingHandler),
-                (r'/book/(\d+)$',BookHandler)]
+                (r'/book/(\d+)$',BookHandler),
+                (r'/search/',SearchHandler)]
         settings = dict(template_path=os.path.join(os.path.dirname(__file__), "templates"),
                 static_path=os.path.join(os.path.dirname(__file__), "static"),
                 cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
@@ -144,6 +145,43 @@ class BookHandler(BaseHandler):
             db.rollback()
             self.write('0')
 
+class SearchHandler(tornado.web.RequestHandler):
+    def get(self):
+        keyword = self.get_argument("kw")
+        category = self.get_argument("by")
+
+
+        if category == 'title':
+            cur.execute("SELECT * FROM book_info WHERE book_name LIKE %%s%", keyword)
+            books = cur.fetchall()
+            booklist = []
+            for row in books:
+                group = {}
+                group['bookname'] = row[1]
+                group['author'] = row[2]
+                group['publish'] = row[3]
+                group['average_score'] = row[6]
+                group['picture'] = row[4]
+                group['tag'] = row[7]
+                group['isbn'] = row[0]
+                booklist.append(group)
+            self.render('index.html',me=self.current_user,books=booklist)
+
+        elif category == 'author':
+            cur.execute("SELECT * FROM book_info WHERE author LIKE %%s%", keyword)
+            books = cur.fetchall()
+            booklist = []
+            for row in books:
+                group = {}
+                group['bookname'] = row[1]
+                group['author'] = row[2]
+                group['publish'] = row[3]
+                group['average_score'] = row[6]
+                group['picture'] = row[4]
+                group['tag'] = row[7]
+                group['isbn'] = row[0]
+                booklist.append(group)
+            self.render('index.html',me=self.current_user,books=booklist)                
         
         
 
