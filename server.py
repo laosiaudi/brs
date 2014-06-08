@@ -195,10 +195,10 @@ class SettingHandler(BaseHandler):
             data = []
             for item in result:
                 titem = item.split(',')
-                for digit in titem:
+                for digit in titem[:-1]:
                     data.append(int(digit))
-            print data[:-1]
-            self.render("settings.html",me=self.current_user, tags = data[:-1])
+            print data
+            self.render("settings.html",me=self.current_user, tags = data)
         else:
             self.redirect('/login')
 
