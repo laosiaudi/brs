@@ -2,10 +2,6 @@ A books recommendation system.
 It's just a homework.  
 
 
-###To do:  
-
-* add '你可能喜欢'
-
 
 
 ScreenShot:  
