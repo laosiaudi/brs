@@ -128,17 +128,15 @@ class BookHandler(BaseHandler):
         self.render('book.html',me = self.current_user,book = group)
 
     def post(self, para):
-#        score = self.get_argument('score')
-#        isbn = self.get_argument('isbn')
-        score =  9.7
-        isbn = '9787532740086'
+        score = self.get_argument('scoreRange')
+        #isbn = self.get_argument('isbn')
+        isbn =  para
         cur.execute("SELECT user_id from userinfo_db WHERE email = '%s'" %\
                 (self.current_user))
         data = cur.fetchone()
         user_id = int(data[0])
         try:
-            cur.execute("INSERT INTO score_info (user_id, isbn, score) VALUES ('%d', '%s','%f')" % (user_id, isbn, float(score)))
-            print '---'
+            cur.execute("REPLACE INTO score_info (user_id, isbn, score) VALUES ('%d', '%s','%f')" % (user_id, isbn, float(score)))
             db.commit()
             self.write('1')
         except:
@@ -199,6 +197,7 @@ class SettingHandler(BaseHandler):
                 titem = item.split(',')
                 for digit in titem:
                     data.append(digit)
+            print data[:-1]
             self.render("settings.html",me=self.current_user, tags = data[:-1])
         else:
             self.redirect('/login')
