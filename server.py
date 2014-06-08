@@ -196,7 +196,7 @@ class SettingHandler(BaseHandler):
             for item in result:
                 titem = item.split(',')
                 for digit in titem:
-                    data.append(digit)
+                    data.append(int(digit))
             print data[:-1]
             self.render("settings.html",me=self.current_user, tags = data[:-1])
         else:
