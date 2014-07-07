@@ -9,6 +9,8 @@ import md5
 from tornado.options import define, options
 import json
 import pymongo
+
+
 define("port", default = 8000, help = "run on the given port", type = int)
 
 db = MySQLdb.connect(host= "localhost", user= "root", passwd= "123456", db
@@ -16,9 +18,11 @@ db = MySQLdb.connect(host= "localhost", user= "root", passwd= "123456", db
 db.set_character_set('utf8')
 cur = db.cursor()
 
+
 class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
         return self.get_secure_cookie("user")
+
 
 class Application(tornado.web.Application):
     def __init__(self):
@@ -33,10 +37,12 @@ class Application(tornado.web.Application):
                 static_path=os.path.join(os.path.dirname(__file__), "static"),
                 cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
                 debug=True,)
+
         conn=pymongo.Connection("localhost",27017)
         commentDB=conn["commentDB"]
         self.db = conn.commentDB.commentSet
         tornado.web.Application.__init__(self, handlers, **settings)
+
 
 class LoginHandler(BaseHandler):
     def get(self):
@@ -62,6 +68,8 @@ class LogoutHandler(BaseHandler):
     def get(self):
         self.set_secure_cookie('user','')
         self.redirect('/login')
+
+
 class IndexHandler(BaseHandler):
     def get(self):
         cur.execute("SELECT book_name, author, average_score, picture, tag, isbn from \
@@ -93,7 +101,7 @@ class IndexHandler(BaseHandler):
                         taglist = book['tag'].split(' ')[:-1]
                         if not item in taglist:
                             booklist.remove(book)
-        #books = json.dumps(booklist)
+
         newblist =  []
         if len(booklist) < 20:
             for item in booklist:
@@ -112,8 +120,8 @@ class IndexHandler(BaseHandler):
             booklist =  newblist
             print len(booklist)
 
-
         self.render("index.html", me=self.current_user,books = booklist)
+
 
 class BookHandler(BaseHandler):
     def get(self,para):
@@ -177,12 +185,11 @@ class BookHandler(BaseHandler):
             bookset['comment'][str(user_id).encode('utf-8')] = comment
         self.write('1')
 
+
 class SearchHandler(tornado.web.RequestHandler):
     def get(self):
         keyword = self.get_argument("kw")
         category = self.get_argument("by")
-        #print keyword
-
 
         if category == 'title':
             cur.execute("SELECT * FROM book_info WHERE book_name LIKE '%s' " %
@@ -220,7 +227,6 @@ class SearchHandler(tornado.web.RequestHandler):
         
         
 
-
 class SettingHandler(BaseHandler):
     def get(self):
         if self.current_user != '' and self.current_user !=  None:
@@ -256,6 +262,7 @@ class SettingHandler(BaseHandler):
             db.rollback()
             self.write('0') #This indicates that the settings update failed
 
+
 class RegisterHandler(BaseHandler):
     def get(self):
         if self.current_user == '' or self.current_user == None:
@@ -269,8 +276,7 @@ class RegisterHandler(BaseHandler):
         key = md5.new()
         key.update(Password);
         Interests = ''
-	print '2014'
-	print Email
+
         for i in range(47):
             if self.get_argument(str(i),None) !=None:
                 Interests += str(i) + ','

@@ -4,6 +4,7 @@
 # 2014 @laosiaudi All rights reserved
 # CREATED:  2014-06-05 20:04:49
 # MODIFIED: 2014-06-05 22:49:15
+
 import tornado.httpserver
 import tornado.ioloop
 import tornado.options
@@ -11,9 +12,11 @@ import tornado.web
 import MySQLdb
 import json
 
+
 db = MySQLdb.connect(host= "localhost", user= "JinnieTsai", passwd= "cj", db
         = "bookdb")
 cur = db.cursor()
+
 
 class SearchHandler(tornado.web.RequestHandler):
     def post(self):
