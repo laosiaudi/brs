@@ -179,10 +179,11 @@ class BookHandler(BaseHandler):
             commentpair = {}
             commentpair[str(user_id).encode('utf-8')] = comment
             newset['comment'] = commentpair
-            commentSet.insert(newset)
+            self.application.db.insert(newset)
 
         else:
             bookset['comment'][str(user_id).encode('utf-8')] = comment
+            self.application.db.update({"isbn":isbn},{"$set":bookset})
         self.write('1')
 
 
