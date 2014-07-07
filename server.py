@@ -32,6 +32,9 @@ class Application(tornado.web.Application):
                 static_path=os.path.join(os.path.dirname(__file__), "static"),
                 cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
                 debug=True,)
+        conn=pymongo.Connection("localhost",27017)
+        commentDB=conn["commentDB"]
+        self.db = conn.commentDB.commentSet
         tornado.web.Application.__init__(self, handlers, **settings)
 
 class LoginHandler(BaseHandler):
@@ -129,6 +132,7 @@ class BookHandler(BaseHandler):
 
     def post(self, para):
         score = self.get_argument('scoreRange')
+        comment = self.get_argument('comment')
         #isbn = self.get_argument('isbn')
         isbn =  para
         cur.execute("SELECT user_id from userinfo_db WHERE email = '%s'" %\
@@ -138,10 +142,22 @@ class BookHandler(BaseHandler):
         try:
             cur.execute("REPLACE INTO score_info (user_id, isbn, score) VALUES ('%d', '%s','%f')" % (user_id, isbn, float(score)))
             db.commit()
-            self.write('1')
         except:
             db.rollback()
             self.write('0')
+        commentSet = self.application.db
+        bookset = commentSet.find_one({"isbn":isbn})
+        if bookset == None:
+            newset = {}
+            newset['isbn'] = isbn
+            commentpair = {}
+            commentpair[user_id] = comment
+            newset['comment'] = commentpair
+            commentSet.insert(newset)
+
+        else:
+            bookset['comment'][user_id] = comment
+        self.write('1')
 
 class SearchHandler(tornado.web.RequestHandler):
     def get(self):
