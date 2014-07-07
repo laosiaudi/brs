@@ -131,11 +131,21 @@ class BookHandler(BaseHandler):
         group['introduction'] =  row[6]
         commentset = self.application.db
         commentinfo = commentset.find_one({"isbn":para})
+        newcom = []
+            
         if commentinfo == None:
             self.render('book.html',me = self.current_user,book = group, comments='')
         else:
+            com = commentinfo['comment']
+            for item in com:
+                cur.execute("SELECT email from userinfo_db WHERE user_id = '%d'" %\
+                        (int(item)))
+                data = cur.fetchone()
+                email  =  data[0]
+                percom = {'user': email, 'text': com[item]}
+                newcom.append(percom)
             self.render('book.html',me = self.current_user,book = group,
-                    comments=json.dumps(commentinfo['comment']))
+                    comments=newcom)
 
 
     def post(self, para):
@@ -159,12 +169,12 @@ class BookHandler(BaseHandler):
             newset = {}
             newset['isbn'] = isbn
             commentpair = {}
-            commentpair[self.current_user] = comment
+            commentpair[str(user_id).encode('utf-8')] = comment
             newset['comment'] = commentpair
             commentSet.insert(newset)
 
         else:
-            bookset['comment'][self.current_user] = comment
+            bookset['comment'][str(user_id).encode('utf-8')] = comment
         self.write('1')
 
 class SearchHandler(tornado.web.RequestHandler):
@@ -189,7 +199,7 @@ class SearchHandler(tornado.web.RequestHandler):
                 group['tag'] = row[7]
                 group['isbn'] = row[0]
                 booklist.append(group)
-            self.render('index.html',me=self.current_user,books=booklist)
+            self.render('search.html',me=self.current_user,books=booklist)
 
         elif category == 'author':
             cur.execute("SELECT * FROM book_info WHERE author LIKE '%s' " % ('%'
@@ -206,7 +216,7 @@ class SearchHandler(tornado.web.RequestHandler):
                 group['tag'] = row[7]
                 group['isbn'] = row[0]
                 booklist.append(group)
-            self.render('index.html',me=self.current_user,books=booklist)                
+            self.render('search.html',me=self.current_user,books=booklist)                
         
         
 

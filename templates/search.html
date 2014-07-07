@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block main %}
+  <h4 style='color:blue;'>您可能喜欢：</h4>
   {% for book in books %}
     <div class="col-6 col-sm-6 col-lg-4">
       <h4>{{ book['bookname'] }}</h4>
@@ -9,7 +10,12 @@
         <span class='author'>{{ book['author']}} · 著</span><br>
         <span class='rates'><b>评分 - </b>{{ book['average_score'] }}</span>
       </p>
-      <p><a class="btn btn-default" href="/book/{{book['isbn']}}" role="button">View »</a></p>
+      <p>
+	      <a class="btn btn-default" href="/book/{{book['isbn']}}" role="button">View »</a>
+      </p>
     </div>
   {% end for %}
+{% end block %}
+
+{% block side %}
 {% end block %}
