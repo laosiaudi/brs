@@ -35,6 +35,8 @@
     </div>
     {% end if %}
     <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="comments" role="navigation">
+      <hr>
+      <h2 style='margin-left: -70px;'>评论区</h2>
       {% for cm in comments %}
       <hr>
       <h4><span style='color:red;'>{{cm['user']}}</span> ： {{cm['text']}}</h4>
