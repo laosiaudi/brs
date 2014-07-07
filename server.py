@@ -10,7 +10,7 @@ from tornado.options import define, options
 import json
 define("port", default = 8000, help = "run on the given port", type = int)
 
-db = MySQLdb.connect(host= "localhost", user= "caijin", passwd= "some_pass", db
+db = MySQLdb.connect(host= "localhost", user= "root", passwd= "123456", db
         = "bookdb", charset= 'utf8')
 db.set_character_set('utf8')
 cur = db.cursor()
@@ -147,7 +147,7 @@ class SearchHandler(tornado.web.RequestHandler):
     def get(self):
         keyword = self.get_argument("kw")
         category = self.get_argument("by")
-        print keyword
+        #print keyword
 
 
         if category == 'title':
@@ -235,10 +235,12 @@ class RegisterHandler(BaseHandler):
         key = md5.new()
         key.update(Password);
         Interests = ''
+	print '2014'
+	print Email
         for i in range(47):
             if self.get_argument(str(i),None) !=None:
                 Interests += str(i) + ','
-        same_email =  cur.execute("SELECT * FROM userinfo_db WHERE email = %s", (Email))
+        same_email =  cur.execute("SELECT * FROM userinfo_db WHERE email = '{0}'".format(Email))
         if cur.rowcount > 0:
             '''This indicates that some user has already existed with the same
             email or the same user name'''
