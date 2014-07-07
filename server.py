@@ -8,6 +8,7 @@ import os
 import md5
 from tornado.options import define, options
 import json
+import pymongo
 define("port", default = 8000, help = "run on the given port", type = int)
 
 db = MySQLdb.connect(host= "localhost", user= "root", passwd= "123456", db
@@ -128,7 +129,14 @@ class BookHandler(BaseHandler):
         group['tag'] = row[5]
         group['isbn'] = para
         group['introduction'] =  row[6]
-        self.render('book.html',me = self.current_user,book = group)
+        commentset = self.application.db
+        commentinfo = commentset.find_one({"isbn":para})
+        if commentinfo == None:
+            self.render('book.html',me = self.current_user,book = group, comments='')
+        else:
+            self.render('book.html',me = self.current_user,book = group,
+                    comments=json.dumps(commentinfo['comment']))
+
 
     def post(self, para):
         score = self.get_argument('scoreRange')
@@ -151,12 +159,12 @@ class BookHandler(BaseHandler):
             newset = {}
             newset['isbn'] = isbn
             commentpair = {}
-            commentpair[user_id] = comment
+            commentpair[self.current_user] = comment
             newset['comment'] = commentpair
             commentSet.insert(newset)
 
         else:
-            bookset['comment'][user_id] = comment
+            bookset['comment'][self.current_user] = comment
         self.write('1')
 
 class SearchHandler(tornado.web.RequestHandler):
