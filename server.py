@@ -309,6 +309,7 @@ class DiscussHandler(BaseHandler):
         groupintro = self.get_argument("groupintro")
         if self.application.group.find_one({'name':groupname}) != None:
             self.write("0")
+            return
         upload_path = os.path.join(os.path.dirname(__file__), 'files')
         '''if self.request.files.get('uploadpic', None):
             uploadFile = self.request.files['uploadpic'][0]
