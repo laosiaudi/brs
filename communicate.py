@@ -22,7 +22,8 @@ class DiscussHandler(BaseHandler):
             self.write("0")
             return
         upload_path = os.path.join(os.path.dirname(__file__), 'files')
-        '''if self.request.files.get('uploadpic', None):
+        '''
+        if self.request.files.get('uploadpic', None):
             uploadFile = self.request.files['uploadpic'][0]
             filename = groupname
             filepath = os.path.join(upload_path,filename)
@@ -41,10 +42,42 @@ class DiscussHandler(BaseHandler):
         newGroupSet['name'] = groupname.encode('utf-8')
         newGroupSet['intro'] = groupintro.encode('utf-8')
         newGroupSet['admin'] = self.current_user
+        tmp = []
+        newGroupSet['comment'] = tmp
         self.application.group.insert(newGroupSet) 
         self.write("1")
 class GroupHandler(BaseHandler):
     def get(self, para):
-        self.write("To be Continued.....")
+        groupSet = self.application.group
+        group = groupSet.find_one({"name":para}) 
+        newcom = []
+        if 'comment' in group:
+            for item in group['comment']:
+                newcom.append(item)
+        self.render('group.html',me = self.current_user, comments = newcom)
+    def post(self,para):
+        comment = self.get_argument('comment')
+        group = self.application.group.find_one({"name":para})
+        if 'comment' in group:
+            commentlist = group['comment']
+            tmp = {}
+            tmp['user'] = self.current_user
+            tmp['text'] = comment
+            commentlist.append(tmp)
+            group['comment'] = commentlist
+            self.application.group.update({"name":para},{"$set":group})
+            self.write('1')
+        else:
+            tmplist = []
+            tmpcom = {}
+            tmpcom['user'] = self.current_user
+            tmpcom['text'] = comment
+            tmplist.append(tmpcom)
+            group['comment'] = tmplist
+            self.application.group.update({"name":para},{"$set":group})
+            self.write('1')
 
+
+
+        
 
